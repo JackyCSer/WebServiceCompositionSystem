@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC 
+"-//Apache Software Foundation//DTD Struts Configuration 2.1//EN" 
+"http://struts.apache.org/dtds/struts-2.1.dtd">
+<struts>
+
+	<!-- Struts Configuration for LunaPlanner -->
+
+	<!-- 当 struts的配置文件修改后，系统是否自动重新加载该文件， 默认值为false（生产环境下使用），开发阶段最好打开 -->
+	<constant name="struts.configuration.xml.reload" value="true" />
+	<constant name="strtuts.devMode" value="true" />
+
+	<package name="luna-package" namespace="/luna" extends="json-default">
+		<global-results>
+			<result name="error" type="json">
+				<param name="includeProperties">errorMsg</param>
+			</result>
+		</global-results>
+
+		<action name="translate" class="luna.web.action.TranslateAction">
+			<result name="success" type="json">
+				<param name="includeProperties">translatorOutput</param>
+			</result>
+		</action>
+
+		<action name="execute" class="luna.web.action.ExecuteAction">
+			<result name="success" type="json">
+				<param name="includeProperties">plannerOutputString, plannerOutputInfo.*</param>
+			</result>
+		</action>
+	</package>
+
+	<package name="default" extends="struts-default">
+		<!-- <global-results> <result name="error" type="json"> <param name="includeProperties">errorMsg</param> 
+			</result> </global-results> -->
+
+		<action name="upload" class="luna.web.action.FileUploadAction">
+			<result name="success">/index.html</result>
+		</action>
+
+	</package>
+
+
+</struts>    
+

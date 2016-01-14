@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>基于图搜索的不确定性Web服务组合系统</title>
+<link href="./css/bootstrap.css" rel="stylesheet">
+<link href="./css/jacky-demo.css" rel="stylesheet" />
+<script src="./js/jquery-2.1.3.min.js"></script>
+<script src="./js/bootstrap.min.js"></script>
+
+<style type="text/css">
+/* Custom Styles */
+ul.nav-tabs {
+	width: 240px;
+	margin-top: 20px;
+	border-radius: 4px;
+	border: 1px solid #ddd;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.067);
+}
+
+ul.nav-tabs li {
+	margin: 0;
+	border-top: 1px solid #ddd;
+	font-size: 20px;
+}
+
+ul.nav-tabs li:first-child {
+	border-top: none;
+}
+
+ul.nav-tabs li a {
+	margin: 0;
+	padding: 8px 16px;
+	border-radius: 0;
+}
+
+ul.nav-tabs li.active a,ul.nav-tabs li.active a:hover {
+	color: #fff;
+	background: #0088cc;
+	border: 1px solid #0088cc;
+}
+
+ul.nav-tabs li:first-child a {
+	border-radius: 4px 4px 0 0;
+}
+
+ul.nav-tabs li:last-child a {
+	border-radius: 0 0 4px 4px;
+}
+
+ul.nav-tabs.affix {
+	top: 30px; /* Set the top position of pinned element */
+}
+</style>
+</head>
+<body data-spy="scroll" data-target="#myScrollspy">
+	<div class="container">
+		<div class="jumbotron" style="padding-top:10px;padding-bottom:10px;">
+			<p class="amber-font-40 amber-p-center2">基于图搜索的不确定性Web服务组合系统</p>
+		</div>
+		<div class="row">
+			<div class="col-xs-3" id="myScrollspy">
+				<ul class="nav nav-tabs nav-stacked amber-font-weight"
+					data-spy="affix" data-offset-top="125">
+					<li class="amber-li-header"><a href="#section-1">1.
+							服务获取</a></li>
+					<li class="active"><a id="nav1-1" href="#section-1-1">&nbsp;&nbsp;&nbsp;&nbsp;1.1
+							输入</a></li>
+					<li><a id="nav1-2" href="#section-1-2">&nbsp;&nbsp;&nbsp;&nbsp;1.2
+							翻译</a></li>
+					<li><a id="nav1-3" href="#section-1-3">&nbsp;&nbsp;&nbsp;&nbsp;1.3
+							分析</a></li>
+					<li><a id="nav2" href="#section-2">2. 服务组合</a></li>
+
+					<li><a id="nav2-1" href="#section-2-1">&nbsp;&nbsp;&nbsp;&nbsp;2.1
+							执行结果</a></li>
+					<li><a id="nav2-2" href="#section-2-2">&nbsp;&nbsp;&nbsp;&nbsp;2.2
+							组合结果图</a></li>
+					<li><a id="nav2-3" href="#section-2-3">&nbsp;&nbsp;&nbsp;&nbsp;2.3
+							组合解路径</a></li>
+					<li><a id="nav2-4" href="#section-2-4">&nbsp;&nbsp;&nbsp;&nbsp;2.4
+							组合过程分析</a></li>
+
+					<li class="amber-li-header"><a href="#section-3"> 3. 结果分析</a></li>
+					<li><a id="nav3-1" href="#section-3-1">&nbsp;&nbsp;&nbsp;&nbsp;3.1
+							搜索过程分析</a></li>
+					<li><a id="nav3-1" href="#section-3-2">&nbsp;&nbsp;&nbsp;&nbsp;3.2
+							组合时间分析</a></li>
+				</ul>
+			</div>
+
+
+			<div class="col-xs-9">
+				<h2 id="section-1"></h2>
+				<h2 id="section-1-1"></h2>
+				<div class="amber-div-h1">
+					<h1>1.1 输入</h1>
+				</div>
+
+				<div class="panel panel-default">
+					<!--输入面板-->
+					<div class="panel-heading">
+						<strong>输入 PDDL 文件</strong>
+					</div>
+
+					<form role="form" action="upload.action" method="post"
+						enctype="multipart/form-data">
+						<table class="table table-striped">
+							<tr>
+								<th><strong>Domain PDDL File</strong></th>
+							</tr>
+							<tr>
+								<td><input type='text' name='textfield1' id='textfield1'
+									size="10" class='form-control' /> <input type="button"
+									class="btn btn-info" value="浏览..." onclick="f1.click()" /> <input
+									type="file" id="f1"
+									onchange="document.getElementById('textfield1').value=this.value"
+									name="domain"
+									style="position:absolute; filter:alpha(opacity=0); opacity:0; width:0px; "
+									size="1" /></td>
+							</tr>
+
+							<tr>
+								<th><strong>Problem PDDL File</strong></th>
+							</tr>
+							<tr>
+								<td><input type='text' name='textfield2' id='textfield2'
+									size="10" class='form-control' /> <input type="button"
+									class="btn btn-info" value="浏览..." onclick="f2.click()" /> <input
+									type="file" id="f2"
+									onchange="document.getElementById('textfield2').value=this.value"
+									name="problem"
+									style="position:absolute; filter:alpha(opacity=0); opacity:0; width:0px; "
+									size="1" /> <br /> <br />
+									<p class="amber-p-center">
+										<button class="btn btn-primary btn-large" type="submit"
+											id="submit-btn">提交</button>
+									</p>
+									<div id="load"></div></td>
+							</tr>
+						</table>
+					</form>
+				</div>
+				<!--输入面板-->
+
+				<h2 id="section-1-2"></h2>
+
+				<div class="amber-div-h1">
+					<h1>1.2 翻译</h1>
+				</div>
+
+				<div class="panel panel-default">
+					<!--输入面板-->
+					<div class="panel-heading">
+						<strong>参数配置</strong>
+					</div>
+					<div class="panel-body">
+
+						<form class="form-inline">
+							<div class="form-group amber-font-20">
+								选择 PDDL 文件类型:
+								<div class="btn-group">
+									<button type="button" class="btn btn-info" id="fileTypeSelect"
+										name="FOND">FOND</button>
+									<button type="button" class="btn btn-info dropdown-toggle"
+										data-toggle="dropdown">
+										<span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu" role="menu" id="fileTypeSelectUl">
+										<li><a name="FOND">FOND</a></li>
+										<li><a name="POND">POND</a></li>
+									</ul>
+								</div>
+							</div>
+						</form>
+
+
+
+						<p class="amber-p-center">
+							<input type="button" class="btn btn-primary btn-large"
+								id="translate-btn" value="翻译" />
+						</p>
+
+					</div>
+				</div>
+				<!--输入面板-->
+				<h2 id="section-1-3"></h2>
+
+				<div class="amber-div-h1">
+					<h1>1.3 分析</h1>
+				</div>
+
+				翻译结果分析
+				<textarea id="output1" class="form-control" rows="20"
+					style="font-size:20px;"></textarea>
+
+				<h2 id="section-2"></h2>
+				<div class="amber-div-h1">
+					<h1>服务组合</h1>
+				</div>
+
+				<div class="panel panel-default">
+					<!--输入面板: Print Plan-->
+					<div class="panel-heading">
+						<strong>参数配置</strong>
+					</div>
+					<div class="panel-body">
+
+						<div class="row">
+							<div class="col-xs-3">打印组合结果图:</div>
+							<div class="col-xs-3">
+								<div class="btn-group">
+									<button type="button" class="btn btn-info" id="printPlanSelect"
+										name="yes">YES</button>
+									<button type="button" class="btn btn-info dropdown-toggle"
+										data-toggle="dropdown">
+										<span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu" role="menu" id="printPlanSelectUl">
+										<li><a name="yes">YES</a></li>
+										<li><a name="no">NO</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+
+
+						<div class="row">
+							<div class="col-xs-3">搜索算法:</div>
+							<div class="col-xs-3">
+								<div class="btn-group">
+									<button type="button" class="btn btn-info" id="searchAlgSelect"
+										name="-aostar">AO*</button>
+									<button type="button" class="btn btn-info dropdown-toggle"
+										data-toggle="dropdown">
+										<span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu" role="menu" id="searchAlgSelectUl">
+										<li><a name="-aostar">AO*</a></li>
+										<li><a name="-laostar">LAO*</a></li>
+										<li><a name="-laostarx">LAO*X</a></li>
+										<li><a name="-bfsstar">BFS*</a></li>
+
+									</ul>
+								</div>
+							</div>
+						</div>
+
+						<!-- <div class="row">
+							<div class="col-xs-3">启发:</div>
+							<div class="col-xs-3">
+								<div class="btn-group">
+									<button type="button" class="btn btn-info"
+										id="heuristicsSelect" name="-zero">0/1</button>
+									<button type="button" class="btn btn-info dropdown-toggle"
+										data-toggle="dropdown">
+										<span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu" role="menu" id="heuristicsSelectUl">
+										<li><a name="-zero">0/1</a></li>
+										<li><a name="-ff">FF</a></li>
+										<li><a name="-hmax">Max</a></li>
+									</ul>
+								</div>
+							</div>
+						</div> -->
+
+						<!-- 	<div class="row">
+							<div class="col-xs-3">部分可视性:</div>
+							<div class="col-xs-3">
+								<div class="btn-group">
+									<button type="button" class="btn btn-info" id="partialSelect"
+										name="yes">YES</button>
+									<button type="button" class="btn btn-info dropdown-toggle"
+										data-toggle="dropdown">
+										<span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu" role="menu" id="partialSelectUl">
+										<li><a name="yes">YES</a></li>
+										<li><a name="no">NO</a></li>
+									</ul>
+								</div>
+							</div>
+						</div> -->
+
+
+						<p class="amber-p-center">
+							<input type="button" class="btn btn-primary btn-large"
+								id="execute-btn" value="执行" />
+						</p>
+
+					</div>
+				</div>
+				<!--输入面板-->
+
+				<h2 id="section-2-1"></h2>
+
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<strong>2.1 算法执行结果</strong>
+					</div>
+
+					<div class="panel-body">
+						<div class="alert alert-info" role="alert">
+							<div id="result"></div>
+							<br />
+							<div id="resultType"></div>
+						</div>
+					</div>
+				</div>
+
+				<h2 id="section-2-2"></h2>
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<strong>2.2.1 组合结果图 - AO*</strong>
+					</div>
+					<div class="panel-body" id="pic-1-div"></div>
+				</div>
+
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<strong>2.2.2 组合结果图 - LAO*</strong>
+					</div>
+					<div class="panel-body" id="pic-2-div"></div>
+				</div>
+
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<strong>2.2.3 组合结果图 - LAO*X</strong>
+					</div>
+					<div class="panel-body" id="pic-3-div"></div>
+				</div>
+
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<strong>2.2.4 组合结果图 - BFS*</strong>
+					</div>
+					<div class="panel-body" id="pic-4-div"></div>
+				</div>
+
+				<h2 id="section-2-3"></h2>
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<strong>2.3 组合解路径</strong>
+					</div>
+					<div class="panel-body">
+						<div id="printTable"></div>
+						<!-- 打印组合结果表格 -->
+					</div>
+				</div>
+				<h2 id="section-2-4"></h2>
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<strong>2.4 组合过程输出</strong>
+					</div>
+					<div class="panel-body">
+
+						<textarea id="output3" class="form-control" rows="20"
+							style="font-size:20px;"></textarea>
+
+					</div>
+				</div>
+
+				<h2 id="section-3"></h2>
+				<h2 id="section-3-1"></h2>
+				<div class="amber-div-h1">
+					<h1>3.1 图搜索过程分析</h1>
+				</div>
+
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<strong>3.1 图搜索过程分析</strong>
+					</div>
+					<div class="panel-body">
+						<!-- 饼图-1 -->
+						<div id="main" style="height:430px" class="well"></div>
+						<!-- 饼图-2 -->
+						<div id="main1" style="height:430px" class="well"></div>
+					</div>
+				</div>
+
+				<h2 id="section-3-2"></h2>
+				<div class="amber-div-h1">
+					<h1>3.2 组合时间分析</h1>
+				</div>
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<strong>3.2 组合时间分析</strong>
+					</div>
+					<div class="panel-body">
+						<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+						<div id="main2" style="height:430px" class="well"></div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+
+
+	<div id="form_top" class="top_img"></div>
+
+	<script src="./js/echarts-all.js"></script>
+	<script src="./js/amber-script.js"></script>
+	<script src="./js/amber-chart.js"></script>
+	<script type="text/javascript">
+	//Action请求的全局URL
+	var url1 = "luna/translate.action";
+	var url2 = "luna/execute.action";
+	/**下拉菜单参数初始化*/
+
+	var fileType = "FOND";
+
+	var printPlan = "yes";
+	var searchAlgorithm = "-aostar";
+
+	/**发送请求*/
+
+	$("#translate-btn").click(function() {
+	    /* 			$("#output1").load(url1,{
+	     parameters:"{fileType :"+fileType+"}"
+	     }); */
+
+	    //发送请求
+	    $.getJSON(url1, {
+		parameters : "{fileType:" + fileType + "}"
+	    }, function(data) {
+		var str = data.translatorOutput;
+		$("#output1").html(str);
+
+	    });
+
+	});
+
+	$("#execute-btn")
+		.click(
+			function() {
+			    /*参数封装*/
+			    $
+				    .getJSON(
+					    url2,
+					    {
+						parameters : "{printPlan :"
+							+ printPlan + ","
+							+ "searchAlgorithm :"
+							+ searchAlgorithm + "}"
+					    },
+					    function(data) {
+						var content = data.plannerOutputInfo;
+						//2.1
+						$("#result")
+							.html(
+								"组合结果："
+									+ content.result);
+						$("#resultType")
+							.html(
+								"结果类型："
+									+ content.resultType);
+
+						//2.2
+
+						//2.3
+						if (searchAlgorithm == "-laostarx"
+							|| searchAlgorithm == "-bfstar") {
+						    var array = content.finaPlanPath
+							    .split("\n");
+						    printTable(array);
+						}
+
+						//2.4
+						$("#output3")
+							.html(
+								data.plannerOutputString);
+
+						//3.1  //3.2
+						if (searchAlgorithm == "-laostarx") {
+						    //3.1 
+						    option = myChart
+							    .getOption();
+						    option.series[0].data[0].value = content.provenNodeNumber;
+						    option.series[0].data[1].value = content.totalNodeNumber
+							    - content.provenNodeNumber;
+						    myChart.setOption(option,
+							    true);
+						    //3.2
+						    var sdata1 = new Array();
+						    sdata1[1] = content.timeNeededForPreprocess;
+						    sdata1[2] = content.timeNeededForSearch;
+						    sdata1[0] = content.timeNeeded;
+						    option2 = myChart2
+							    .getOption();
+						    option2.series[0].data = sdata1;
+						    myChart2.setOption(option2,
+							    true);
+						    //2
+						    var str = "<a href='./planner_output/lao_star_x/final_plan_lao_star_x.png' target='_blank'>"
+							    + "<img src='./planner_output/lao_star_x/final_plan_lao_star_x.png' width='100%'></a>";
+						    $("#pic-3-div").html(str);
+						} else if (searchAlgorithm == "-bfsstar") {
+						    //3.1 
+						    option1 = myChart1
+							    .getOption();
+						    option1.series[0].data[0].value = content.provenNodeNumber;
+						    option1.series[0].data[1].value = content.totalNodeNumber
+							    - content.provenNodeNumber;
+						    myChart1.setOption(option1,
+							    true);
+						    //3.2
+						    var sdata1 = new Array();
+						    sdata1[1] = content.timeNeededForPreprocess;
+						    sdata1[2] = content.timeNeededForSearch;
+						    sdata1[0] = content.timeNeeded;
+						    option2 = myChart2
+							    .getOption();
+						    option2.series[1].data = sdata1;
+						    myChart2.setOption(option2,
+							    true);
+						    //2
+						    var str = "<a href='./planner_output/bfs_star/final_plan_bfs_star.png' target='_blank'>"
+							    + "<img src='./planner_output/bfs_star/final_plan_bfs_star.png' width='100%'></a>";
+						    $("#pic-4-div").html(str);
+
+						} else if (searchAlgorithm == "-aostar") {
+						    var str = "<a href='./planner_output/ao_star/final_plan_ao_star.png' target='_blank'>"
+							    + "<img src='./planner_output/ao_star/final_plan_ao_star.png' width='100%'></a>";
+						    $("#pic-1-div").html(str);
+
+						} else if (searchAlgorithm == "-laostar") {
+						    var str = "<a href='./planner_output/lao_star/final_plan_lao_star.png' target='_blank'>"
+							    + "<img src='./planner_output/lao_star/final_plan_lao_star.png' width='100%'></a>";
+						    $("#pic-2-div").html(str);
+						}
+
+					    });
+
+			});
+    </script>
+</body>
+</html>
